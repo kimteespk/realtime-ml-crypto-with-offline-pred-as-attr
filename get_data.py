@@ -4,7 +4,9 @@ import pandas_ta as ta # technical indicator
 from numpy import timedelta64 # convert timezone
 import ccxt #
 
-lst_symbol = ['ETHUSDT', 'BTCUSDT']#, 'BNBUSDT', 'XRPUSDT', 'ADAUSDT', 'SOLUSDT']
+from time import sleep
+
+lst_symbol = ['SOL/USDT']# 'ETH/USDT' 'BTC/USDT' 'BNB/USDT' XRP/USDT 'ADA/USDT'
 start_date = '2023-01-01 00:00:00'
 timeframe = '1m'
 
@@ -17,19 +19,22 @@ for symbol in lst_symbol:
     print('\n\nSYMBOL :', symbol)
     bars = exchange.fetch_ohlcv(symbol, timeframe=timeframe, since= from_ts, limit=1000)
     while True:
+        # sleep(1)
         from_ts = bars[-1][0]
         new_bars = exchange.fetch_ohlcv(symbol, timeframe=timeframe, since= from_ts, limit=1000)
         bars.extend(new_bars)
         if len(new_bars) != 1000:
             break
-    
+        
+
     
         
 
     df = pd.DataFrame(bars, columns=['timestamp', 'open', 'high', 'low','close', 'volume'])
     df['timestamp'] = pd.to_datetime(df['timestamp'], unit= 'ms') + timedelta64(7, 'h')
     print(df.head(1))
-    df.to_csv(f'./dataset/tf{timeframe}_{symbol}_{start_date.split(" ")[0]}-_{df.iloc[-1][0].date()}.csv')
+    df.to_csv(f'./dataset/tf{timeframe}_{symbol.replace("/","")}_{start_date.split(" ")[0]}-_{df.iloc[-1][0].date()}.csv')
+    sleep(2)
 
 # from_ts = exchange.parse8601('2023-01-01 00:00:00')
 # ohlcv_list = []
