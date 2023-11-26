@@ -4,7 +4,7 @@ import pandas_ta as ta # technical indicator
 from numpy import timedelta64 # convert timezone
 import ccxt #
 
-lst_symbol = ['ETHUSDT', 'BTCUSDT', 'BNBUSDT', 'XRPUSDT', 'ADAUSDT', 'SOLUSDT']
+lst_symbol = ['ETHUSDT', 'BTCUSDT']#, 'BNBUSDT', 'XRPUSDT', 'ADAUSDT', 'SOLUSDT']
 start_date = '2023-01-01 00:00:00'
 timeframe = '1m'
 
