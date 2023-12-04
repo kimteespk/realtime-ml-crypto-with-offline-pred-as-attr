@@ -26,6 +26,7 @@ for symbol in lst_symbol:
         if len(new_bars) != 1000:
             break
         
+        
 
     
         
