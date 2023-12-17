@@ -6,6 +6,8 @@ from river.compose import Pipeline, FuncTransformer
 from river.linear_model import LinearRegression
 from river.preprocessing import StandardScaler
 
+from river.forest import AMFRegressor, ARFRegressor
+
 from river.utils import Rolling
 from river.metrics import MAE
 
@@ -69,8 +71,10 @@ def create_pipeline():
     pl = Pipeline(
         # ('ordinal_date', FuncTransformer(get_ordinal_date)),
         ('scale', StandardScaler()),
-        ('lr', LinearRegression())
+        ('AMF REG ', AMFRegressor(seed=42))
+        # ('lr', LinearRegression())
     )
+    print(pl)
 
     return pl
 
@@ -78,14 +82,32 @@ def create_metric():
     return Rolling(MAE(), 12)
 
 def learn_pred(x, y, pl, metric):
+    
+    # version 0.21.0
     if x['openPrice'] == None:
         return x, y, None, pl, metric
     try:
         y_pred_old = pl.predict_one(x)
-        pl = pl.learn_one(x, y)
-        metric = metric.update(y, y_pred_old)
+        pl.learn_one(x, y)
+        metric.update(y, y_pred_old)
     except:
         return x, y, None, pl, metric
+    
+    # version 0.20.1
+    # if x['openPrice'] == None:
+    #     return x, y, None, pl, metric
+    # try:
+    #     y_pred_old = pl.predict_one(x)
+    #     pl = pl.learn_one(x, y)
+    #     metric = metric.update(y, y_pred_old)
+    # except:
+    #     return x, y, None, pl, metric
+
+    # y_pred_old = pl.predict_one(x)
+    # # pl = pl.learn_one(x, y)
+    # pl = pl.learn_one(x, y)
+    # print(pl)
+    # metric = metric.update(y, y_pred_old)
 
 
     return x, y, y_pred_old, pl, metric
