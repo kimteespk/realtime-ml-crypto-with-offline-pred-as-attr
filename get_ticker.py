@@ -2,10 +2,7 @@ import requests
 from time import sleep
 from datetime import datetime as dt
 
-# garbage collector
-import gc
-gc.enable()
-gc.collect()
+
 
 # get data 1m 5m 15m 1h 1d 
 def get_data(symbol= 'ETHUSDT', tf= '1m'):
@@ -32,6 +29,10 @@ def append_to_file(row_data: str, symbol, window, base_path= './dataset/realtime
 
 
 if __name__ == '__main__':
+    # garbage collector
+    import gc
+    gc.enable()
+    gc.collect()
     import sys
     # print(f'RUNNING :{sys.argv[0]}')
     args = sys.argv

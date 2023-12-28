@@ -9,7 +9,7 @@ from river.preprocessing import StandardScaler
 from river.forest import AMFRegressor, ARFRegressor
 
 from river.utils import Rolling
-from river.metrics import MAE
+from river.metrics import MAE, MSE
 
 ############# DATA PREPROCESSING ####################
 def convert_timestamp(dct, unit= 'ms'):
@@ -78,8 +78,14 @@ def create_pipeline():
 
     return pl
 
-def create_metric():
-    return Rolling(MAE(), 12)
+def create_metric(metric_str= 'MSE', rolling_size= 12):
+    dct_met = {
+        'MAE': MAE,
+        'MSE': MSE
+    }
+    met = dct_met[metric_str.upper()]
+    return Rolling(met(), rolling_size)
+    # return Rolling(MAE(), 12)
 
 def learn_pred(x, y, pl, metric):
     
