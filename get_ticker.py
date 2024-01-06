@@ -52,8 +52,12 @@ def get_ccxt_data(symbol= 'ETHUSDT', tf= '1m', limit= None, insert_db= False):
         limit = 999999999
     bars = exchange.fetch_ohlcv(symbol, tf, limit= limit)
     df = DataFrame(bars, columns= ['timestamp', 'open', 'high', 'low','close', 'volume'])
-    if insert_db == True and symbol == 'ETHUSDT':
+    if symbol == 'ETHUSDT':
         my_orm_table = OhlcvETH
+    elif symbol == 'BNBUSDT':
+        my_orm_table = OhlcvBNB
+    if insert_db == True:
+        # my_orm_table = OhlcvETH
         table_name = 'ohlcv_' + symbol.lower()
         my_orm_table.__tablename__ = table_name
         print('Ohlcv.__tablename__\t\t',my_orm_table.__tablename__)

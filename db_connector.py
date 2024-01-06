@@ -118,6 +118,7 @@ def db_insert(data, engine= None, Base= Base, ORMclass= TickerEthusdt):
             count = len(data)
 
         session.commit()
+        print(f'\n\ninsert data {count} records to table {ORMclass.__tablename__} complete')
     
     except Exception as e:
         print('\n\n Error inserting data :{e}')
@@ -130,7 +131,7 @@ def db_insert(data, engine= None, Base= Base, ORMclass= TickerEthusdt):
 
 
 
-    print(f'\n\ninsert data {count} records to table complete')
+    
 
     
 if __name__ == '__main__':
