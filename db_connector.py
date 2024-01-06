@@ -1,12 +1,22 @@
 
-from sqlalchemy import create_engine, text, Column, Float, Integer, Double
+from sqlalchemy import create_engine, text, Column, Float, Integer, Double, BigInteger
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
+from configparser import ConfigParser
+
+config = ConfigParser()
+config.read('config.ini')
+cfg = config['DB']
+user = cfg['user']
+pwd = cfg['pwd']
+db_name = cfg['db_name']
+host = cfg['host']
+port = cfg['port']
 
 
-
-def my_engine(user= 'confluent2', pwd= 'confluent2', host= 'localhost', port= '3307', db_name= 'default'):
+# def my_engine(user= 'confluent2', pwd= 'confluent2', host= 'localhost', port= '3307', db_name= 'default'):
+def my_engine(user= user, pwd= pwd, host= host, port= port, db_name= db_name):
     # Connect to the database
     engine = create_engine(f"mysql+mysqlconnector://{user}:{pwd}@{host}:{port}/{db_name}")
     return engine
@@ -56,9 +66,33 @@ class TickerEthusdt(Base):
     quoteVolume = Column(Float, nullable=False)
     volume = Column(Float, nullable=False)
     weightedAvgPrice = Column(Float, nullable=False)
+    
+class OhlcvETH(Base):
+    __tablename__ = 'ohlcv_ethusdt'
+    # print('\n\nCONNECT :', __tablename__)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    timestamp = Column(BigInteger, nullable=False)
+    open = Column(Float, nullable=False)
+    high = Column(Float, nullable=False)
+    low = Column(Float, nullable=False)
+    close = Column(Float, nullable=False)
+    volume = Column(Float, nullable=False)
+    
+class OhlcvBNB(Base):
+    __tablename__ = 'ohlcv_bnbusdt'
+    # print('\n\nCONNECT :', __tablename__)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    timestamp = Column(BigInteger, nullable=False)
+    open = Column(Float, nullable=False)
+    high = Column(Float, nullable=False)
+    low = Column(Float, nullable=False)
+    close = Column(Float, nullable=False)
+    volume = Column(Float, nullable=False)
 
 
-def db_insert(data, engine= None, Base= Base):
+
+
+def db_insert(data, engine= None, Base= Base, ORMclass= TickerEthusdt):
     if engine == None:
         engine = my_engine()
     # Create the table in the database
@@ -68,14 +102,35 @@ def db_insert(data, engine= None, Base= Base):
     Session = sessionmaker(bind=engine)
     session = Session()
 
-    # Insert data into the table using ORM
-    ticker_entry = TickerEthusdt(**data)
-    session.add(ticker_entry)
-    session.commit()
+    try:
 
-    # Close the session
-    session.close()
-    print('insert data to table complete')
+        # Insert data into the table using ORM
+        if isinstance(data, dict):
+            ticker_entry = ORMclass(**data)
+            session.add(ticker_entry)
+            count = 1
+        elif isinstance(data, list):
+            # [session.add(ORMclass(**x)) for x in data]
+            for dct_data in data:
+                entry = ORMclass(**dct_data)
+                session.add(entry)
+                # [session.add(ORMclass(**x)) for x in data]
+            count = len(data)
+
+        session.commit()
+    
+    except Exception as e:
+        print('\n\n Error inserting data :{e}')
+    
+    finally:
+        # Close the session
+        session.close()
+    
+    
+
+
+
+    print(f'\n\ninsert data {count} records to table complete')
 
     
 if __name__ == '__main__':

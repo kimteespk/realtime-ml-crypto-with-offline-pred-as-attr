@@ -21,3 +21,22 @@ CREATE TABLE ticker_ethusdt (
     volume DOUBLE,
     weightedAvgPrice DOUBLE
 );
+
+
+CREATE TABLE ohlcv_ethusdt (
+    timestamp BIGINT,
+    open DOUBLE,
+    high DOUBLE,
+    low DOUBLE,
+    close DOUBLE,
+    volume DOUBLE
+);
+
+CREATE TABLE ohlcv_bnbusdt (
+    timestamp BIGINT,
+    open DOUBLE,
+    high DOUBLE,
+    low DOUBLE,
+    close DOUBLE,
+    volume DOUBLE
+);

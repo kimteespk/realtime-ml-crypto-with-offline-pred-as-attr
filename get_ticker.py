@@ -7,6 +7,20 @@ from ccxt import binance
 from pandas import to_datetime, DataFrame
 from numpy import timedelta64
 
+# FOR INSERT TO DB
+from db_connector import *
+
+# from configparser import ConfigParser
+
+# config = ConfigParser()
+# config.read('config.ini')
+# cfg = config['DB']
+# user = cfg['user']
+# pwd = cfg['pwd']
+# db_name = cfg['db_name']
+# host = cfg['host']
+# port = cfg['port']
+
 
 
 # get data 1m 5m 15m 1h 1d 
@@ -32,12 +46,33 @@ def append_to_file(row_data: str, symbol, window, base_path= './dataset/realtime
     return True
 
 
-def get_ccxt_data(symbol= 'ETHUSDT', tf= '1m', limit= None):
+def get_ccxt_data(symbol= 'ETHUSDT', tf= '1m', limit= None, insert_db= False):
     exchange = binance()
     if limit == None:
         limit = 999999999
     bars = exchange.fetch_ohlcv(symbol, tf, limit= limit)
     df = DataFrame(bars, columns= ['timestamp', 'open', 'high', 'low','close', 'volume'])
+    if insert_db == True and symbol == 'ETHUSDT':
+        my_orm_table = OhlcvETH
+        table_name = 'ohlcv_' + symbol.lower()
+        my_orm_table.__tablename__ = table_name
+        print('Ohlcv.__tablename__\t\t',my_orm_table.__tablename__)
+        
+        engine = my_engine()#user, pwd, host, port, db_name)
+        col, lst_row = db_select(table_name, engine= engine)
+        
+        # SELECT ONLY NEW DATA TO INSERT
+        if len(lst_row) > 0:
+            newest_db_data_ts = lst_row[-1][0] 
+            new_data_for_db = df.loc[df['timestamp'] > newest_db_data_ts].to_dict('records')
+        else:
+            new_data_for_db = df.to_dict('records')
+        # print(new_data_for_db)
+        # print(new_data_for_db[0])
+    
+            
+        db_insert(new_data_for_db, engine= engine, ORMclass= my_orm_table)
+        
     df['timestamp'] = to_datetime(df['timestamp'], unit= 'ms') + timedelta64(7, 'h')
     
     return df
@@ -65,7 +100,3 @@ if __name__ == '__main__':
             pass
         sleep(1)
 
-
-# dct = {'test': 'value1', 'key2': 'value2'}
-# ','.join(str(value) for value in dct.values())
-# str(dct)
