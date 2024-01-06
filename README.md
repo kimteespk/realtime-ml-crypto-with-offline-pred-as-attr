@@ -1,4 +1,4 @@
-create file config.ini at root directory details below
+create file config.ini at root directory for database connection configuration
 
 [DB]
 user = your_db_user
