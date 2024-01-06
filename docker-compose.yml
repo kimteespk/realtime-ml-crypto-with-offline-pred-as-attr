@@ -1,0 +1,16 @@
+version: '2'
+services:
+  quickstart-mysql2:
+    container_name: mysql_crypto
+    hostname: mysql
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: confluent2
+      MYSQL_USER: confluent2
+      MYSQL_PASSWORD: confluent2
+      MYSQL_DATABASE: default
+    volumes:
+      - ./mysql/db_setup.sql:/tmp/db_setup.sql
+    ports:
+      - "3307:3306"
+    # command: "bash -c 'mysql -u confluent -pconfluent < /tmp/db_setup.sql'"

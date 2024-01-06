@@ -1,4 +1,9 @@
 kt/
+result/
+amf_n10_step5.csv
+config.ini
+.*
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -75,7 +80,7 @@ docs/_build/
 # PyBuilder
 .pybuilder/
 target/
-
+explore_data/
 # Jupyter Notebook
 .ipynb_checkpoints
 

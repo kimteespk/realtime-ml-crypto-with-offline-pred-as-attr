@@ -9,7 +9,11 @@ from river.preprocessing import StandardScaler
 from river.forest import AMFRegressor, ARFRegressor
 
 from river.utils import Rolling
-from river.metrics import MAE
+from river.metrics import MAE, MSE, RMSE
+
+from river import feature_extraction as fx
+
+
 
 ############# DATA PREPROCESSING ####################
 def convert_timestamp(dct, unit= 'ms'):
@@ -40,6 +44,43 @@ def preprocessing_pipeline(dct):
 
     
     return dct
+
+def create_agg():
+
+    max_pct_price_chg = fx.Agg(
+        on= 'priceChangePercent',
+        by= 'hour',
+        how = stats.Max()
+    )
+
+    min_pct_price_chg = fx.Agg(
+        on= 'priceChangePercent',
+        by= 'hour',
+        how = stats.Min()
+    )
+    agg = (max_pct_price_chg + min_pct_price_chg)
+    
+    return agg
+
+
+def _get_agg_feature_name(agg_item):
+    return '_'.join([agg_item.on , str(agg_item.how).split(':')[0].lower(),'by', agg_item.by[0]])
+
+    
+    
+def transform_agg(data, agg):
+    if data[agg[0].by[0]] == None:
+        for i in range(len(agg)):
+            dct = {_get_agg_feature_name(agg[i]): None}
+            data.update(dct)
+        return data
+    # print(data)
+    agg.learn_one(data)
+    dct_result = agg.transform_one(data)
+    data.update(dct_result)
+    
+    return data
+
     
     
     
@@ -71,15 +112,23 @@ def create_pipeline():
     pl = Pipeline(
         # ('ordinal_date', FuncTransformer(get_ordinal_date)),
         ('scale', StandardScaler()),
-        ('AMF REG ', AMFRegressor(seed=42))
+        ('AMF REG ', AMFRegressor(n_estimators= 10, step= 5,seed=42))
         # ('lr', LinearRegression())
     )
     print(pl)
 
     return pl
 
-def create_metric():
-    return Rolling(MAE(), 12)
+
+def create_metric(metric_str= 'MSE', rolling_size= 12):
+    dct_met = {
+        'MAE': MAE,
+        'MSE': MSE,
+        'RMSE': RMSE
+    }
+    met = dct_met[metric_str.upper()]
+    return Rolling(met(), rolling_size)
+    # return Rolling(MAE(), 12)
 
 def learn_pred(x, y, pl, metric):
     
