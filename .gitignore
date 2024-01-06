@@ -3,6 +3,7 @@ result/
 amf_n10_step5.csv
 config.ini
 .*
+ETH_callback
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
