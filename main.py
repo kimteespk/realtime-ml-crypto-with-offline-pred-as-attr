@@ -18,7 +18,7 @@ symbol = 'ETHUSDT'
 metric_str = 'RMSE'
 metric_rolling_size = 60
 
-insert_to_db =  True#False
+insert_to_db =  False
 
 # db param
 table_name_prefix = 'ticker_'
@@ -26,9 +26,13 @@ table_name_prefix = 'ticker_'
 # DUMMY DATAKEY
 data_key = ['openPrice', 'highPrice', 'lowPrice', 'lastPrice', 'priceChangePercent',
             'volume',
-            'hour']
+            'hour',
+            'eth_1h_vol',
+            'btc_price',
+            'btc_1h_vol'
+            ]
 y_key = 'lastPrice'
-window_size = 300
+window_size = 60
 
 ## READ DATA FROM CSV
 # header 
@@ -91,10 +95,20 @@ lst_x_y = []
 c = 0
 # for record in lst_raw_data: # from dataframe
 while True: # use when get real data
+    # GET ETH DATA 1m
     record = get_data(symbol, tf= '1m')
-    
+    # INSERT RAW DATA TO DB
     if insert_to_db == True:
         db_insert(record, engine= engine)
+        
+    # GET ETH DATA 1h
+    record['eth_1h_vol'] = get_data(symbol, tf= '1h')['volume']
+    # GET BTC DATA
+    btc_record = get_data('BTCUSDT', tf= '1h')
+    record['btc_price'] = btc_record['lastPrice']
+    record['btc_1h_vol'] = btc_record['volume']
+    
+
         
     # print(record)
     # print('\nopenPrice brefore preprocess :', record['openPrice'])
@@ -209,7 +223,7 @@ avg_error = sum(lst_error) / len(lst_error)
 #     dict_writer.writeheader()
 #     dict_writer.writerows(lst_x_y)
 
-# print(f'AVERAGE ERROR :{avg_error:.6f}')
+print(f'AVERAGE ERROR :{avg_error:.6f}')
 plot_result(lst_result)
 
 ############################################################################################################

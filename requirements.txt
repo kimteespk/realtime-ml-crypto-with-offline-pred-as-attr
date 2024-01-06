@@ -15,3 +15,6 @@ Requests==2.31.0
 river==0.21.0
 mysql-connector-python==8.2.0
 sqlalchemy==2.0.23
+
+tensorflow==2.15.0
+scikit-learn==1.2.2

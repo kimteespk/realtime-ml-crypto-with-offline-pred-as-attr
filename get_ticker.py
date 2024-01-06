@@ -2,6 +2,11 @@ import requests
 from time import sleep
 from datetime import datetime as dt
 
+from ccxt import binance
+
+from pandas import to_datetime, DataFrame
+from numpy import timedelta64
+
 
 
 # get data 1m 5m 15m 1h 1d 
@@ -26,6 +31,17 @@ def append_to_file(row_data: str, symbol, window, base_path= './dataset/realtime
     print(f'{dt.now().time()} append {symbol} data to {path}')
     return True
 
+
+def get_ccxt_data(symbol= 'ETHUSDT', tf= '1m', limit= None):
+    exchange = binance()
+    if limit == None:
+        limit = 999999999
+    bars = exchange.fetch_ohlcv(symbol, tf, limit= limit)
+    df = DataFrame(bars, columns= ['timestamp', 'open', 'high', 'low','close', 'volume'])
+    df['timestamp'] = to_datetime(df['timestamp'], unit= 'ms') + timedelta64(7, 'h')
+    
+    return df
+    
 
 
 if __name__ == '__main__':
