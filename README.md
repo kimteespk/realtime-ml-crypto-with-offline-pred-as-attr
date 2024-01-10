@@ -5,7 +5,7 @@
 - [Database Configuration](#database-configuration)
 - [Docker Environment](#docker-environment)
 - [Installation](#installation)
-
+- [Report/Document](#Report-Document)
 
 ## Database Configuration
 
@@ -29,4 +29,7 @@
 1. Run cmd to install libs
    ```ini
    pip install -r requirements.txt
+
+## Report and Document
+- https://github.com/kimteespk/realtime-ml-crypto-with-offline-pred-as-attr/blob/main/doc.pdf
 
